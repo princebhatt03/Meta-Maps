@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Maps</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <div id="map"></div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+      integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+      integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+      crossorigin="anonymous"></script>
+    <script>
+      const socket = io();
+
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          position => {
+            const { latitude, longitude } = position.coords;
+            socket.emit('send-location', { latitude, longitude });
+          },
+          error => {
+            console.error(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          }
+        );
+      }
+
+      const map = L.map('map').setView([0, 0], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Your Location',
+      }).addTo(map);
+      const markers = {};
+
+      socket.on('receive-location', data => {
+        const { id, latitude, longitude } = data;
+        map.setView([latitude, longitude]);
+        if (markers[id]) {
+          markers[id].setLatLng([latitude, longitude]);
+        } else {
+          markers[id] = L.marker([latitude, longitude]).addTo(map);
+        }
+      });
+
+      socket.on('user-disconnected', id => {
+        if (markers[id]) {
+          map.removeLayer(markers[id]);
+          delete markers[id];
+        }
+      });
+    </script>
+  </body>
+</html>
