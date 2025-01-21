@@ -5,7 +5,7 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
-    <title>Maps</title>
+    <title>Location Tracker</title>
     <style>
       * {
         margin: 0;
@@ -29,10 +29,14 @@
         font-weight: bold;
         color: white;
         padding: 10px;
-        z-index: 99;
+        z-index: 100;
         background-color: black;
       }
+      .credit span {
+        z-index: 100;
+      }
       .credit a {
+        z-index: 100;
         text-decoration: none;
       }
     </style>
@@ -87,7 +91,13 @@
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Your Location',
       }).addTo(map);
-      const markers = {};
+      const markers = {
+        radius: 5,
+        fillColor: '#0000ff',
+        color: '#0000',
+        weight: 5,
+        opacity: 1,
+      };
 
       socket.on('receive-location', data => {
         const { id, latitude, longitude } = data;
