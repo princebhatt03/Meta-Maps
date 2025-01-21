@@ -5,7 +5,7 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
-    <title>Maps</title>
+    <title>Meta Maps</title>
     <style>
       * {
         margin: 0;
@@ -29,10 +29,14 @@
         font-weight: bold;
         color: white;
         padding: 10px;
-        z-index: 99;
+        z-index: 100;
         background-color: black;
       }
+      .credit span {
+        z-index: 100;
+      }
       .credit a {
+        z-index: 100;
         text-decoration: none;
       }
     </style>
@@ -42,18 +46,21 @@
       integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer" />
+    <link
+      rel="shortcut icon"
+      href="/img/logo.png"
+      type="image/x-icon" />
   </head>
   <body>
-    <div id="map">
-      <div class="credit">
-        <span
-          >Owner
-          <a href="https://www.linkedin.com/in/prince-bhatt-0958a725a/"
-            >Prince Bhatt</a
-          ></span
-        >
-      </div>
+    <div class="credit">
+      <span
+        >Created By:
+        <a href="https://www.linkedin.com/in/prince-bhatt-0958a725a/"
+          >Prince Bhatt</a
+        ></span
+      >
     </div>
+    <div id="map"></div>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
       integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
@@ -87,7 +94,13 @@
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Your Location',
       }).addTo(map);
-      const markers = {};
+      const markers = {
+        radius: 5,
+        fillColor: '#0000ff',
+        color: '#0000',
+        weight: 5,
+        opacity: 1,
+      };
 
       socket.on('receive-location', data => {
         const { id, latitude, longitude } = data;
